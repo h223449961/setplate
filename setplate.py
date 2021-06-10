@@ -1,19 +1,14 @@
 #-*-coding: utf-8-*-  
-
 import cv2
 import numpy as np
 import math
-
 def stretch(img):
     max = float(img.max())
     min = float(img.min())
- 
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
-            img[i, j] = (255/(max-min))*img[i,j]-(255*min)/(max-min)
-             
-    return img
-     
+            img[i, j] = (255/(max-min))*img[i,j]-(255*min)/(max-min)         
+    return img 
 def dobinaryzation(img):
     max = float(img.max())
     min = float(img.min())
@@ -77,56 +72,50 @@ def locate_license(img, orgimg):
 	return blocks[maxindex][0]
 	
 def find_license(img):
-	'''預處理'''
-	# 壓縮圖像
-	img = cv2.resize(img,(1000,500))
+    img = cv2.resize(img,(1000,500))
+    grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    '''
+    拉伸灰
+    '''
+    stretchedimg = stretch(grayimg)
+    '''
+    開運算
+    '''
+    kernel = np.zeros((33, 43), dtype=np.uint8)
+    cv2.circle(kernel, (16, 16),16, 1, -1)	 
+    openingimg = cv2.morphologyEx(stretchedimg, cv2.MORPH_OPEN, kernel)
+    strtimg = cv2.absdiff(stretchedimg,openingimg)
+    '''
+    將照片二值化
+    '''
+    binaryimg = dobinaryzation(strtimg)
+    '''
+    canny
+    '''
+    cannyimg = cv2.Canny(binaryimg, binaryimg.shape[0], binaryimg.shape[1])
 	 
-	# RGB轉灰色
-	grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	 
-	# 灰度拉伸
-	stretchedimg = stretch(grayimg)
-	 
-	# 進行開運算，用來去噪聲
-	r = 16
-	h = w = r * 2 + 1
-	kernel = np.zeros((h, w), dtype=np.uint8)
-	cv2.circle(kernel, (r, r), r, 1, -1)
-	 
-	openingimg = cv2.morphologyEx(stretchedimg, cv2.MORPH_OPEN, kernel)
-	strtimg = cv2.absdiff(stretchedimg,openingimg)
-	 
-	# 圖像二值化
-	binaryimg = dobinaryzation(strtimg)
-	 
-	# 使用Canny函數做邊緣檢測
-	cannyimg = cv2.Canny(binaryimg, binaryimg.shape[0], binaryimg.shape[1])
-	 
-	''' 消除小區域，保留大塊區域，從而定位車牌'''
+	#''' 消除小區域，保留大塊區域，從而定位車牌'''
 	# 進行閉運算
-	kernel = np.ones((5,19), np.uint8)
-	closingimg = cv2.morphologyEx(cannyimg, cv2.MORPH_CLOSE, kernel)
+    kernel = np.ones((5,19), np.uint8)
+    closingimg = cv2.morphologyEx(cannyimg, cv2.MORPH_CLOSE, kernel)
 	 
 	# 進行開運算
-	openingimg = cv2.morphologyEx(closingimg, cv2.MORPH_OPEN, kernel)
+    openingimg = cv2.morphologyEx(closingimg, cv2.MORPH_OPEN, kernel)
 	 
 	# 再次進行開運算
-	kernel = np.ones((11,5), np.uint8)
-	openingimg = cv2.morphologyEx(openingimg, cv2.MORPH_OPEN, kernel)
+    kernel = np.ones((11,5), np.uint8)
+    openingimg = cv2.morphologyEx(openingimg, cv2.MORPH_OPEN, kernel)
 
 	# 消除小區域，定位車牌位置
-	rect = locate_license(openingimg, img)
+    rect = locate_license(openingimg, img)
 	
-	return rect, img
+    return rect, img
 	
 if __name__ == '__main__':
-	# 讀取圖片
-	orgimg = cv2.imread('07.jpeg')
-	rect, img = find_license(orgimg)
-
-	# 框出車牌
-	cv2.rectangle(img, (rect[0], rect[1]), (rect[2], rect[3]), (0,255,0),2)
-	cv2.imshow('img', img)
-
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+    orgimg = cv2.imread('04.jpeg')
+    orgimg = cv2.resize(orgimg,(1000,500))
+    rect, img = find_license(orgimg)
+    cv2.rectangle(img, (rect[0], rect[1]), (rect[2], rect[3]), (0,255,0),2)
+    cv2.imshow('img', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
