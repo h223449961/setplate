@@ -13,6 +13,6 @@ http://www.jcreview.com/fulltext/jcr070309.pdf
 
 https://sci-hub.se/10.1109/ACCESS.2020.2994287
 
-以下是原始引數：
+以下是 step by step 說明：
 
 https://www.itread01.com/content/1544337017.html
