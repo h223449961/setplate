@@ -67,7 +67,7 @@ def find_license(img):
     '''
     stretchedimg = stretch(grayimg)
     '''
-    開閉開開
+    開閉開開閉
     創造先高在寬的全部都是零的 mask
     '''
     kernel = np.zeros((33, 34), dtype=np.uint8)
@@ -76,6 +76,9 @@ def find_license(img):
     第一次開運算
     '''
     openingimg = cv2.morphologyEx(stretchedimg, cv2.MORPH_OPEN, kernel)
+    '''
+    獲取差分圖，這樣可以去除照片中的雜訊
+    '''
     strtimg = cv2.absdiff(stretchedimg,openingimg)
     '''
     將照片二值化
@@ -91,7 +94,7 @@ def find_license(img):
     '''
     kernel = np.ones((5,19), np.uint8)
     '''
-    閉運算
+    第一次閉運算
     '''
     closingimg = cv2.morphologyEx(cannyimg, cv2.MORPH_CLOSE, kernel)
     '''
@@ -103,7 +106,17 @@ def find_license(img):
     '''
     kernel = np.ones((11,5), np.uint8)
     openingimg = cv2.morphologyEx(openingimg, cv2.MORPH_OPEN, kernel)
-    rect = locate_license(openingimg, img)
+    '''
+    第一次閉運算
+    '''
+    kernel = np.ones((5, 19), np.uint8)
+    closingimg1 = cv2.morphologyEx(openingimg, cv2.MORPH_CLOSE, kernel)
+    '''
+    膨脹
+    '''
+    kernel_2 = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    kernel_dilated = cv2.dilate(closingimg1, kernel_2)
+    rect = locate_license(kernel_dilated, img)
     return rect, img
 if __name__ == '__main__':
     orgimg = cv2.imread('04.jpeg')
