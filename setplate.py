@@ -18,12 +18,9 @@ def stretch(img):
 def dobinaryzation(img):
     max = float(img.max())
     min = float(img.min())
-     
     x = max - ((max-min) / 2)
     ret, threshedimg = cv2.threshold(img, x, 255, cv2.THRESH_BINARY)
-     
     return threshedimg
-
 def find_retangle(contour):
 	y, x = [], []
 	for p in contour:
