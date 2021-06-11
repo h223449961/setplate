@@ -107,7 +107,7 @@ def find_plates(image):
     消除小區域，保留大塊區域，從而定位車牌
     創造先高在寬的全部都是一的 mask
     '''
-    kernel=np.ones((5,24),np.uint8) # 調 5 24
+    kernel=np.ones((5,24),np.uint8) # 5 24
     '''
     第一次閉運算
     '''
