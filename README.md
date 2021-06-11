@@ -20,3 +20,5 @@ https://www.itread01.com/content/1544337017.html
 以下是原始引數：
 
 https://github.com/Jumpingk/projects/blob/master/%E8%BD%A6%E7%89%8C%E6%A3%80%E6%B5%8B/license_plate_detection.py
+
+https://blog.csdn.net/qq_45804132/article/details/114150432
